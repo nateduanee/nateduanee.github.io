@@ -1,0 +1,38 @@
+.body1{
+    background-color: aquamarine;
+}
+.container {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    margin-left: 17%;
+}
+
+#div1{
+    height: 300px;
+    width: 300px;
+    margin: 50px;
+    border: 10px solid black;
+    
+}
+
+#div2{
+    height: 300px;
+    width: 300px;
+    margin: 50px;
+    border: 10px solid orange;
+}
+
+#div3{
+    height: 300px;
+    width: 300px;
+    margin: 50px;
+    border: 10px solid green;
+}
+
+#div4{
+    height: 300px;
+    width: 300px;
+    margin: 50px;
+    border: 10px solid pink;
+    background-color:  white;
+}

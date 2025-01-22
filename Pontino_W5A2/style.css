@@ -1,0 +1,12 @@
+#div1 {
+font-size: 100px;
+background-color: green;
+  }
+
+  #div2 {
+    font-size: 100px;
+    background-color: red;
+      }
+      body{
+        margin: 0;
+      }
