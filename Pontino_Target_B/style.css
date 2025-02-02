@@ -1,0 +1,13 @@
+body{
+    background-color: red;
+    margin: 0;
+}
+
+footer{
+background-color: aqua;
+height: 100px;
+width: 100%;
+margin: 0px;
+position: absolute;
+bottom: 0;
+}

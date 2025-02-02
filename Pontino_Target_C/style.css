@@ -1,0 +1,32 @@
+body{
+    margin: 0;
+    display: flex;
+}
+
+footer{
+background-color: aqua;
+height: 100px;
+width: 100%;
+margin: 0px;
+position: absolute;
+bottom: 0;
+}
+
+.container{
+    display: inline-grid;
+    grid-template-columns: auto auto;
+}
+
+.left{
+    height: 650px;
+    width: 670px;
+background-color: red;
+display: flex;
+}
+
+.right{
+    height: 650px;
+    width: 725px;
+    background-color: green;
+    display: flex;
+}

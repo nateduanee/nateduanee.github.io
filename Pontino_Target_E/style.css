@@ -1,0 +1,50 @@
+body{
+    margin: 0px;
+    display: flex;
+    background-color: white;
+}
+
+footer{
+    background-color: aqua;
+    height: 100px;
+    width: 100%;
+    margin: 0px;
+    position: absolute;
+    bottom: 0;
+    }
+
+.container{
+    display: flex;
+    background-color: white;
+    grid-template-columns: auto auto;
+}
+
+.leftContainer{
+    background-color: red;
+    height: 650px;
+    width: 670px;
+    justify-content: flex-end;
+}
+
+.rightContainer{
+    background-color: green;
+    height: 650px;
+    width: 725px;
+    justify-content: flex-start;
+}
+
+#bigLeft{
+    border: 10px solid white;
+    background-color: white;
+    height: 350px;
+    width: 500px;
+    margin-top: 20px;
+}
+
+#bigRight{
+    border: 10px solid white;
+    background-color: white;
+    height: 350px;
+    width: 555px;
+    margin-top: 20px;
+}
