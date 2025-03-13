@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meal Mate</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Meal Mate</h1>
+    <div id="user-info"></div>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+
+  <nav>
+    <button onclick="showTab('recipesTab')">Recipes</button>
+    <button onclick="showTab('groceryTab')">Grocery List</button>
+    <button onclick="showTab('calendarTab')">Meal Calendar</button>
+  </nav>
+
+  <main class="container">
+    <!-- Recipe Suggestions Section -->
+    <section id="recipesTab" class="tab-content">
+      <h2>Recipe Suggestions</h2>
+      <div class="search-container">
+        <input type="text" id="ingredientInput" placeholder="Enter ingredients (e.g. chicken, rice)" />
+        <button onclick="suggestRecipes()">Search</button>
+      </div>
+      <ul id="recipeList"></ul>
+    </section>
+
+    <!-- Grocery List Section -->
+    <section id="groceryTab" class="tab-content">
+        <h2>Grocery List</h2>
+        <div id="groceryListContainer"></div>
+      </section>
+
+    <!-- Meal Calendar Section -->
+    <section id="calendarTab" class="tab-content">
+      <h2>Meal Calendar Planner</h2>
+      <div id="weeklyCalendar" class="weekly-calendar"></div>
+    </section>
+  </main>
+
+  <!-- Modal for Viewing Full Recipe -->
+  <div id="recipeModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <img id="modalImage" src="" alt="Recipe Image" />
+      <div id="modalInstructionsContainer">
+        <p id="modalInstructions"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Day Selection -->
+  <div id="dayModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeDayModal()">&times;</span>
+      <h2>Select a Day</h2>
+      <div id="dayOptions" class="day-options">
+        <button onclick="selectDay('Monday')">Monday</button>
+        <button onclick="selectDay('Tuesday')">Tuesday</button>
+        <button onclick="selectDay('Wednesday')">Wednesday</button>
+        <button onclick="selectDay('Thursday')">Thursday</button>
+        <button onclick="selectDay('Friday')">Friday</button>
+        <button onclick="selectDay('Saturday')">Saturday</button>
+        <button onclick="selectDay('Sunday')">Sunday</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    // Show default tab on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      showTab('recipesTab');
+      firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    loadCalendarRecipesFromFirestore();
+  }
+});
+    });
+  </script>
+</body>
+</html>

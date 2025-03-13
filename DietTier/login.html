@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Meal Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    :root {
+      --primary-color: #0A1C4A;
+      --accent-color: #E73331;
+      --background-color: #F5F5F5;
+      --card-bg: #FFFFFF;
+      --nav-bg: #1F2D56;
+      --text-color: #333333;
+      --font-family: 'Roboto', Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--background-color);
+      font-family: var(--font-family);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .login-container {
+      background-color: var(--card-bg);
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+      font-size: 1.6rem;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid var(--nav-bg);
+      border-radius: 30px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s ease;
+      background-color: #fff;
+    }
+
+    .login-container input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 6px rgba(231, 51, 49, 0.3);
+    }
+
+    .login-container button {
+      width: 100%;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .login-container button:hover {
+      background-color: #c53030;
+    }
+
+    .login-container a {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message, .success-message {
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .error-message {
+      color: #e74c3c;
+    }
+
+    .success-message {
+      color: #27ae60;
+    }
+
+    #signupSection,
+    #forgotSection {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ccc;
+    }
+
+    #signupSection h2,
+    #forgotSection h2 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Meal Planner Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="error-message" id="loginError"></div>
+
+    <a href="#" onclick="toggleSection('signup')">Don't have an account? Sign up</a><br>
+    <a href="#" onclick="toggleSection('forgot')">Forgot Password?</a>
+
+    <div id="signupSection" style="display:none; margin-top:2rem;">
+      <h2>Sign Up</h2>
+      <input type="email" id="signupEmail" placeholder="Email">
+      <input type="password" id="signupPassword" placeholder="Enter your password">
+      <button onclick="signUp()">Create Account</button>
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
+    </div>
+
+    <div id="forgotSection" style="display:none; margin-top:2rem;">
+      <h2>Reset Password</h2>
+      <input type="email" id="forgotEmail" placeholder="Enter your email">
+      <button onclick="resetPassword()">Send Reset Link</button>
+      <div class="error-message" id="resetError"></div>
+      <div class="success-message" id="resetSuccess"></div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSection(section) {
+      document.getElementById('signupSection').style.display = section === 'signup' ? 'block' : 'none';
+      document.getElementById('forgotSection').style.display = section === 'forgot' ? 'block' : 'none';
+    }
+
+    function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const loginError = document.getElementById('loginError');
+      loginError.textContent = "";
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = "mealmate.html";
+        })
+        .catch(error => {
+          loginError.textContent = error.message;
+        });
+    }
+
+    function signUp() {
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      const signupError = document.getElementById('signupError');
+      const signupSuccess = document.getElementById('signupSuccess');
+      signupError.textContent = "";
+      signupSuccess.textContent = "";
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          signupSuccess.textContent = "Account created successfully. You can now login.";
+        })
+        .catch(error => {
+          signupError.textContent = error.message;
+        });
+    }
+
+    function resetPassword() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const resetError = document.getElementById('resetError');
+      const resetSuccess = document.getElementById('resetSuccess');
+      resetError.textContent = "";
+      resetSuccess.textContent = "";
+
+      if (!email) {
+        resetError.textContent = "Please enter your email.";
+        return;
+      }
+
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+          resetSuccess.textContent = "Password reset link sent to your email.";
+        })
+        .catch(error => {
+          resetError.textContent = error.message;
+        });
+    }
+  </script>
+</body>
+</html>

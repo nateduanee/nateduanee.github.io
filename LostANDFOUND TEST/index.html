@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found Portal</title>
+  <style>
+    :root {
+      --dark-blue: #0A1C4A; /* Dark Blue (Border & Text) */
+      --bright-red: #E73331; /* Bright Red (Background & Laurel Wreath) */
+      --white: #FFFFFF; /* White (Background and Figure Details) */
+      --dark-gray: #9D9D9C; /* Dark Gray (Right Side of Letter M) */
+      --dark-navy-blue: #1F2D56; /* Dark Navy Blue (Left Side of Letter M) */
+      --light-background: #F5F5F5; /* Light Gray Tint */
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--light-background);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: var(--dark-blue);
+      color: var(--white);
+      padding: 1rem;
+      text-align: center;
+    }
+    header img {
+      max-width: 150px; /* Adjust logo size */
+      margin-bottom: 1rem;
+      border: 3px solid var(--white); /* White border around the logo */
+      border-radius: 8px; /* Rounded corners for the border */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+      background: var(--white); /* White background for the logo */
+      padding: 5px; /* Padding to create space between the logo and border */
+    }
+    main {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+      background: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: var(--dark-blue);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, textarea, select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%; /* Full width for mobile */
+      box-sizing: border-box; /* Include padding in width */
+    }
+    button {
+      background: var(--dark-blue);
+      color: var(--white);
+      border: none;
+      padding: 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%; /* Full width for mobile */
+    }
+    button:hover {
+      background: var(--bright-red);
+    }
+    .item-card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--light-background);
+    }
+    .action-buttons {
+      margin-top: 1rem;
+    }
+    .tab-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+    .tab-buttons button {
+      background: var(--dark-blue);
+      color: var(--white);
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      flex: 1; /* Allow buttons to grow */
+      min-width: 120px; /* Minimum width for buttons */
+    }
+    .tab-buttons button.active {
+      background: #2c5282; /* Darker shade for active tab */
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    #loginSection {
+      max-width: 400px;
+      margin: 2rem auto;
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    #logoutBtn {
+      margin-top: 1rem;
+      background: var(--bright-red);
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: #777;
+      margin-top: 2rem;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal-content {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://mcm.edu.ph/wp-content/uploads/2022/06/Logo-Final_noname_1.png" alt="MMCM Logo">
+    <h1>Lost & Found Portal</h1>
+  </header>
+
+  <div id="microsoftLoginSection">
+    <h2>Sign in with your MCM Email</h2>
+    <button onclick="loginWithMicrosoft()">Sign in with Microsoft</button>
+  </div>
+
+  <div id="loginSection" style="display: none;">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <main style="display: none;">
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="postTab">Post Item</button>
+      <button class="tab-btn" data-tab="listTab">Items List</button>
+    </div>
+
+    <div id="postTab" class="tab-content active">
+      <h2>Post Lost or Found Item</h2>
+      <form id="itemForm">
+        <input type="hidden" id="editIndex">
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" placeholder="Color, Brand, Item type" required>
+
+        <label for="item_type">Item Type:</label>
+        <select id="item_type" required onchange="handleItemTypeChange()">
+          <option value="Bag">Bag</option>
+          <option value="ID">ID</option>
+          <option value="Gadget">Gadget</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Books">Books</option>
+          <option value="Keys">Keys</option>
+          <option value="Umbrella">Umbrella</option>
+          <option value="Wallet">Wallet</option>
+          <option value="Others">Others</option>
+        </select>
+
+        <div id="otherItemTypeContainer" style="display:none;">
+          <label for="other_item_type">Specify Other Item Type:</label>
+          <input type="text" id="other_item_type">
+        </div>
+
+        <label for="location">Location Found/Lost:</label>
+        <input type="text" id="location" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" rows="4" required></textarea>
+
+        <label for="status">Status:</label>
+        <select id="status" required>
+          <option value="Lost">Lost</option>
+          <option value="Found">Found</option>
+        </select>
+
+        <label for="image">Upload Photo:</label>
+        <input type="file" id="image" accept="image/*">
+
+        <label for="reporter">Your Name:</label>
+        <input type="text" id="reporter" required>
+
+        <label for="contact">Contact Number:</label>
+        <input type="tel" id="contact" required pattern="[0-9]{11}" placeholder="Enter 11-digit phone number">
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" required>
+
+        <button type="submit">Submit Item</button>
+      </form>
+    </div>
+
+    <div id="listTab" class="tab-content">
+      <h2>Items List</h2>
+      <label for="searchInput">Search Items:</label>
+      <input type="text" id="searchInput" placeholder="Search by item name...">
+      
+      <label for="listStatusFilter">Filter by Status:</label>
+      <select id="listStatusFilter" onchange="filterItemsByStatus()">
+        <option value="all">All Items</option>
+        <option value="Lost">Lost</option>
+        <option value="Found">Found</option>
+      </select>
+
+      <label for="listTypeFilter">Filter by Item Type:</label>
+      <select id="listTypeFilter" onchange="filterItemsByStatus()">
+        <option value="all">All Types</option>
+        <option value="Bag">Bag</option>
+        <option value="ID">ID</option>
+        <option value="Gadget">Gadget</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Books">Books</option>
+        <option value="Keys">Keys</option>
+        <option value="Umbrella">Umbrella</option>
+        <option value="Others">Others</option>
+      </select>
+
+      <button id="resetFiltersBtn" onclick="resetFilters()">Reset Filters</button>
+      <div id="itemsContainer"></div>
+    </div>
+
+    <button id="logoutBtn">Logout</button>
+  </main>
+
+  <footer><p>&copy; 2025 Lost & Found Portal</p></footer>
+
+  <div id="deleteModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Confirm Deletion</h3>
+      <p>Are you sure you want to delete this item?</p>
+      <button id="confirmDeleteBtn">Yes, Delete</button>
+      <button id="cancelDeleteBtn">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // Login
+    const loginSection = document.getElementById('loginSection');
+    const loginForm = document.getElementById('loginForm');
+    const mainContent = document.querySelector('main');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const validUser  = { username: 'student', password: '1234' };
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (u === validUser .username && p === validUser .password) {
+        localStorage.setItem('loggedIn', 'true');
+        loginSection.style.display = 'none';
+        mainContent.style.display = 'block';
+      } else {
+        alert('Invalid login');
+      }
+    });
+
+    if (localStorage.getItem('loggedIn') === 'true') {
+      loginSection.style.display = 'none';
+      mainContent.style.display = 'block';
+    }
+
+    logoutBtn.onclick = () => { localStorage.removeItem('loggedIn'); location.reload(); };
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      };
+    });
+
+    // Item system
+    let items = JSON.parse(localStorage.getItem('lostFoundItems')) || [];
+    const itemForm = document.getElementById('itemForm');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const editIndexField = document.getElementById('editIndex');
+    let itemToDeleteIndex = null; // To store the index of the item to delete
+
+    function handleItemTypeChange() {
+      const t = document.getElementById('item_type').value;
+      const c = document.getElementById('otherItemTypeContainer');
+      c.style.display = t === 'Others' ? 'block' : 'none';
+      document.getElementById('other_item_type').required = t === 'Others';
+    }
+
+    function displayItems(list) {
+      itemsContainer.innerHTML = '';
+      list.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'item-card';
+        div.innerHTML = `
+          <h3>${item.item_name} (${item.status})</h3>
+          <p><strong>Type:</strong> ${item.item_type}</p>
+          <p><strong>Location:</strong> ${item.location}</p>
+          <p><strong>Description:</strong> ${item.description}</p>
+          <p><strong>Date/Time Posted:</strong> ${item.timestamp}</p>
+          ${item.image ? `<img src="${item.image}" style="max-width:100%; height:auto;">` : ''}
+          <p><strong>Reported by:</strong> ${item.reporter}</p>
+          <p><strong>Contact:</strong> ${item.contact}</p>
+          <p><strong>Email:</strong> ${item.email}</p>
+          ${item.claimed_by ? `
+            <p><strong>Claimed By:</strong> ${item.claimed_by.name} (ID: ${item.claimed_by.id})</p>
+            ${item.claimed_by.photo ? `<img src="${item.claimed_by.photo}" alt="ID Photo" style="max-width:100px; border:1px solid #ccc; margin-bottom: 1rem;">` : ''}
+            <br><button class="edit-btn" onclick="editClaimedInfo(${i})">Edit Claimed Info</button>` : ''}
+          <div class="action-buttons">
+            ${item.status === 'Lost' ? `<button class="mark-found-btn" onclick="markAsFound(${i})">Mark as Found</button>` : ''}
+            <button class="edit-btn" onclick="editItem(${i})">Edit</button>
+            <button class="delete-btn" onclick="confirmDelete(${i})">Delete</button>
+          </div>`;
+        itemsContainer.appendChild(div);
+      });
+    }
+
+    function confirmDelete(index) {
+      itemToDeleteIndex = index; // Store the index of the item to delete
+      document.getElementById('deleteModal').style.display = 'flex'; // Show the delete confirmation modal
+    }
+
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+      if (itemToDeleteIndex !== null) {
+        items.splice(itemToDeleteIndex, 1); // Delete the item
+        save();
+        document.getElementById('deleteModal').style.display = 'none'; // Hide the modal
+        itemToDeleteIndex = null; // Reset the index
+      }
+    };
+
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+      document.getElementById('deleteModal').style.display = 'none'; // Hide the modal
+      itemToDeleteIndex = null; // Reset the index
+    };
+
+    function markAsFound(i) {
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div style="background:white; padding:2rem; border-radius:12px; min-width:300px; max-width:400px; box-shadow:0 4px 10px rgba(0,0,0,0.2); text-align:left;">
+          <h3 style='margin-bottom:1rem;'>Claim Item</h3>
+          <form id="claimForm" style="display:flex; flex-direction:column; gap:1rem;">
+            <label>Claimer Name: <input type="text" id="claimName" required></label>
+            <label>Student ID: <input type="number" id="claimID" required></label>
+            <label>Email: <input type="email" id="claimEmail" required></label>
+            <label>Phone Number: <input type="tel" id="claimPhone" required pattern="[0-9]{11}" placeholder="Enter 11-digit phone number"></label>
+            <label>ID Photo: <input type="file" id="claimPhoto" accept="image/*"></label>
+            <div style="display:flex; justify-content:space-between; gap:1rem;">
+              <button type="submit" style="flex:1; background:#0A1C4A; color:white; border:none; padding:0.5rem; border-radius:4px;">Save</button>
+              <button type="button" id="closeClaimModalBtn" style="flex:1; background:#E73331; color:white; border:none; padding:0.5rem; border-radius:4px;">Close</button>
+            </div>
+          </form>
+        </div>`;
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.display = 'flex';
+      modal.style.justifyContent = 'center';
+      modal.style.alignItems = 'center';
+      modal.style.zIndex = '9999';
+      modal.appendChild(container);
+      document.body.appendChild(modal);
+
+      document.getElementById('closeClaimModalBtn').onclick = () => document.body.removeChild(modal);
+
+      const form = container.querySelector('#claimForm');
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById('claimName').value;
+        const sid = document.getElementById('claimID').value;
+        const email = document.getElementById('claimEmail').value;
+        const phone = document.getElementById('claimPhone').value;
+        const file = document.getElementById('claimPhoto').files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          items[i].status = 'Found';
+          items[i].claimed_by = {
+            name: name,
+            id: sid,
+            email: email,
+            phone: phone,
+            photo: reader.result || ''
+          };
+          save();
+          document.body.removeChild(modal);
+        };
+        if (file) reader.readAsDataURL(file); else reader.onload();
+      };
+    }
+
+    function save() {
+      localStorage.setItem('lostFoundItems', JSON.stringify(items));
+      displayItems(items);
+    }
+
+    function editItem(i) {
+      const item = items[i];
+      document.getElementById('item_name').value = item.item_name;
+      document.getElementById('item_type').value = item.item_type;
+      handleItemTypeChange();
+      if (item.item_type === 'Others') document.getElementById('other_item_type').value = item.item_type;
+      document.getElementById('location').value = item.location;
+      document.getElementById('description').value = item.description;
+      document.getElementById('status').value = item.status;
+      document.getElementById('reporter').value = item.reporter;
+      document.getElementById('contact').value = item.contact;
+      document.getElementById('email').value = item.email; // Set email for editing
+      editIndexField.value = i;
+
+      // Switch to Post Item Tab automatically
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="postTab"]').classList.add('active');
+      document.getElementById('postTab').classList.add('active');
+    }
+
+    itemForm.onsubmit = e => {
+      e.preventDefault();
+      const i = editIndexField.value;
+      const ftype = document.getElementById('item_type').value;
+      const imgFile = document.getElementById('image').files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        const item = {
+          item_name: document.getElementById('item_name').value,
+          item_type: ftype === 'Others' ? document.getElementById('other_item_type').value : ftype,
+          location: document.getElementById('location').value,
+          description: document.getElementById('description').value,
+          status: document.getElementById('status').value,
+          image: reader.result,
+          reporter: document.getElementById('reporter').value,
+          contact: document.getElementById('contact').value,
+          email: document.getElementById('email').value, // Get email from input
+          timestamp: new Date().toLocaleString()
+        };
+        if (i === '') items.push(item); else items[i] = item;
+        itemForm.reset(); handleItemTypeChange(); editIndexField.value = '';
+        save();
+      };
+      if (imgFile) reader.readAsDataURL(imgFile); else reader.onload();
+    };
+
+    function searchItems() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const statusFilter = document.getElementById('listStatusFilter').value;
+      const typeFilter = document.getElementById('listTypeFilter').value;
+      let filtered = items;
+
+      if (keyword) {
+        filtered = filtered.filter(item => item.item_name.toLowerCase().includes(keyword));
+      }
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(item => item.status === statusFilter);
+      }
+      if (typeFilter !== 'all') {
+        filtered = filtered.filter(item => item.item_type === typeFilter);
+      }
+
+      displayItems(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', searchItems);
+    document.getElementById('listStatusFilter').addEventListener('change', searchItems);
+    document.getElementById('listTypeFilter').addEventListener('change', searchItems);
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('listStatusFilter').value = 'all';
+      document.getElementById('listTypeFilter').value = 'all';
+      displayItems(items); // Display all items after resetting filters
+    }
+
+    displayItems(items);
+
+    function editClaimedInfo(i) {
+      const container = document.createElement('div');
+      container.innerHTML = `
+        <div class="modal">
+          <div class="modal-content">
+            <h3 style='margin-bottom:1rem;'>Edit Claimed Information</h3>
+            <form id="claimedForm" style="display:flex; flex-direction:column; gap:1rem;">
+              <label>Claimer Name: <input type="text" id="claimedName" value="${items[i].claimed_by?.name || ''}" required></label>
+              <label>Student ID: <input type="number" id="claimedID" value="${items[i].claimed_by?.id || ''}" required></label>
+              <label>Email: <input type="email" id="claimedEmail" value="${items[i].claimed_by?.email || ''}" required></label>
+              <label>Phone Number: <input type="tel" id="claimedPhone" value="${items[i].claimed_by?.phone || ''}" required pattern="[0-9]{11}" placeholder="Enter 11-digit phone number"></label>
+              <label>ID Photo: <input type="file" id="claimedPhoto" accept="image/*"></label>
+              <div style="display:flex; justify-content:space-between; gap:1rem;">
+                <button type="submit" style="flex:1; background:#0A1C4A; color:white; border:none; padding:0.5rem; border-radius:4px;">Save</button>
+                <button type="button" id="closeModalBtn" style="flex:1; background:#E73331; color:white; border:none; padding:0.5rem; border-radius:4px;">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>`;
+      document.body.appendChild(container);
+
+      const form = container.querySelector('#claimedForm');
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById('claimedName').value;
+        const sid = document.getElementById('claimedID').value;
+        const email = document.getElementById('claimedEmail').value;
+        const phone = document.getElementById('claimedPhone').value;
+        const file = document.getElementById('claimedPhoto').files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          items[i].claimed_by = {
+            name: name,
+            id: sid,
+            email: email,
+            phone: phone,
+            photo: reader.result || items[i].claimed_by?.photo || ''
+          };
+          save();
+          document.body.removeChild(container);
+        };
+        if (file) reader.readAsDataURL(file); else reader.onload();
+      };
+
+      // Close modal on Close button click
+      document.getElementById('closeModalBtn').onclick = () => document.body.removeChild(container);
+    }
+  </script>
+</body>
+</html>
