@@ -1,6 +1,3 @@
-// firebase-config.js must be loaded before this file
-// Assuming Firebase is initialized in firebase-config.js
-
 let recipeGroceryLists = {}; // { recipeName: [ingredient, ...] }
 let calendarRecipes = [];  // { day, id, name, image, instructions }
 let pendingRecipe = null;  // For day selection modal
@@ -257,11 +254,12 @@ function saveCalendarRecipesToFirestore() {
     }
   }
 
-function removeFromCalendar(id) {
-  calendarRecipes = calendarRecipes.filter(r => r.id !== id);
-  renderCalendarRecipes();
-  showToast("Recipe removed from calendar.");
-}
+  function removeFromCalendar(id) {
+    calendarRecipes = calendarRecipes.filter(r => r.id !== id);
+    renderCalendarRecipes();
+    saveCalendarRecipesToFirestore();
+    showToast("Recipe removed from calendar.");
+  }
 
 function saveGroceryListsToFirestore() {
   const user = firebase.auth().currentUser;
