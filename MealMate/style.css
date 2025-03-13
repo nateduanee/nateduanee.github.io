@@ -25,9 +25,11 @@
     line-height: 1.6;
   }
   
-  .tab-content {
-    display: none;
-  }
+.tab-content {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
   
   /* Header */
   header {
@@ -228,6 +230,7 @@
   #groceryListContainer {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
     margin-top: 1rem;
   }
