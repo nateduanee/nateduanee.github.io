@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="https://mcm.edu.ph/wp-content/uploads/2022/06/Logo-Final_noname_1.png" alt="MMCM Logo">
+    <h1>Lost & Found Portal</h1>
+  </header>
+
+  <div id="microsoftLoginSection">
+    <h2>Sign in with your MCM Email</h2>
+    <button onclick="loginWithMicrosoft()">Sign in with Microsoft</button>
+  </div>
+
+  <main style="display: none;">
+    <p id="userInfo" style="text-align: right; font-size: 0.85rem; color: #444;"></p>
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="postTab">Post Item</button>
+      <button class="tab-btn" data-tab="listTab">Items List</button>
+    </div>
+
+    <!-- Post Item Tab -->
+    <div id="postTab" class="tab-content active">
+      <h2>Post Lost or Found Item</h2>
+      <!-- Your item form stays here (same structure as before) -->
+      <form id="itemForm">
+        <input type="hidden" id="editIndex">
+      
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" placeholder="Color, Brand, Item type" required>
+      
+        <label for="item_type">Item Type:</label>
+        <select id="item_type" required onchange="handleItemTypeChange()">
+          <option value="Bag">Bag</option>
+          <option value="ID">ID</option>
+          <option value="Gadget">Gadget</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Books">Books</option>
+          <option value="Keys">Keys</option>
+          <option value="Umbrella">Umbrella</option>
+          <option value="Wallet">Wallet</option>
+          <option value="Others">Others</option>
+        </select>
+      
+        <div id="otherItemTypeContainer" style="display: none;">
+          <label for="other_item_type">Specify Other Item Type:</label>
+          <input type="text" id="other_item_type">
+        </div>
+      
+        <label for="location">Location Found/Lost:</label>
+        <input type="text" id="location" required>
+      
+        <label for="description">Description:</label>
+        <textarea id="description" rows="4" required></textarea>
+      
+        <label for="status">Status:</label>
+        <select id="status" required>
+          <option value="Lost">Lost</option>
+          <option value="Found">Found</option>
+        </select>
+      
+        <label for="image">Upload Photo:</label>
+        <input type="file" id="image" accept="image/*">
+      
+        <label for="reporter">Your Name:</label>
+        <input type="text" id="reporter" required>
+      
+        <label for="contact">Contact Number:</label>
+        <input type="tel" id="contact" required pattern="[0-9]{11}" placeholder="Enter 11-digit phone number">
+      
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" required>
+      
+        <button type="submit">Submit Item</button>
+      </form>      
+    </div>
+
+    <!-- Items List Tab -->
+    <div id="listTab" class="tab-content">
+      <h2>Items List</h2>
+      <label for="searchInput">Search Items:</label>
+      <input type="text" id="searchInput" placeholder="Search by item name...">
+
+      <label for="listStatusFilter">Filter by Status:</label>
+      <select id="listStatusFilter">
+        <option value="all">All Items</option>
+        <option value="Lost">Lost</option>
+        <option value="Found">Found</option>
+      </select>
+
+      <label for="listTypeFilter">Filter by Item Type:</label>
+      <select id="listTypeFilter">
+        <option value="all">All Types</option>
+        <option value="Bag">Bag</option>
+        <option value="ID">ID</option>
+        <option value="Gadget">Gadget</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Books">Books</option>
+        <option value="Keys">Keys</option>
+        <option value="Umbrella">Umbrella</option>
+        <option value="Wallet">Wallet</option>
+        <option value="Others">Others</option>
+      </select>
+
+      <button id="resetFiltersBtn">Reset Filters</button>
+      <div id="itemsContainer"></div>
+    </div>
+
+    <button id="logoutBtn" onclick="logoutFirebase()">Logout</button>
+  </main>
+
+  <footer><p>&copy; 2025 Lost & Found Portal</p></footer>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVPne2zgZ5b-jeJ03_rqnCFoHPIDqUghY",
+    authDomain: "lostandfoundwebapp-1.firebaseapp.com",
+    projectId: "lostandfoundwebapp-1",
+    storageBucket: "lostandfoundwebapp-1.appspot.com",
+    messagingSenderId: "21114802723",
+    appId: "1:21114802723:web:1ed455a389d779cfe2d796"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.OAuthProvider('microsoft.com');
+
+  // Declare globally after DOM loaded
+  window.loginWithMicrosoft = function () {
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        const email = user.email;
+        if (email.endsWith('@mcm.edu.ph')) {
+          alert("Welcome, " + user.displayName);
+          document.getElementById('microsoftLoginSection').style.display = 'none';
+          document.querySelector('main').style.display = 'block';
+        } else {
+          alert("Access denied. Only @mcm.edu.ph accounts are allowed.");
+          auth.signOut();
+        }
+      })
+      .catch((error) => {
+        alert("Login failed: " + error.message);
+      });
+  };
+
+  auth.onAuthStateChanged((user) => {
+    if (user && user.email.endsWith('@mcm.edu.ph')) {
+      document.getElementById('microsoftLoginSection').style.display = 'none';
+      document.querySelector('main').style.display = 'block';
+      document.getElementById('userInfo').innerText = `Logged in as: ${user.displayName} (${user.email})`;
+    } else {
+      document.getElementById('microsoftLoginSection').style.display = 'block';
+      document.querySelector('main').style.display = 'none';
+    }
+  });
+
+  window.logoutFirebase = function () {
+    auth.signOut().then(() => {
+      alert("Logged out successfully");
+      location.reload();
+    });
+  };
+</script>
+
+  <script src="script.js"></script>
+  
+</body>
+</html>
